@@ -4,7 +4,10 @@ import org.xorfilter.bloom.BlockedBloom;
 import org.xorfilter.bloom.Bloom;
 import org.xorfilter.cuckoo.Cuckoo16;
 import org.xorfilter.cuckoo.Cuckoo8;
+import org.xorfilter.cuckoo.CuckooPlus16;
+import org.xorfilter.cuckoo.CuckooPlus8;
 import org.xorfilter.gcs.GolombCompressedSet;
+import org.xorfilter.gcs.GolombCompressedSet2;
 import org.xorfilter.xor.Xor16;
 import org.xorfilter.xor.Xor8;
 import org.xorfilter.xor.XorSimple;
@@ -69,12 +72,30 @@ public enum FilterType {
             return Cuckoo16.construct(keys);
         }
     },
+    CUCKOO_PLUS_8 {
+        @Override
+        public Filter construct(long[] keys, int setting) {
+            return CuckooPlus8.construct(keys);
+        }
+    },
+    CUCKOO_PLUS_16 {
+        @Override
+        public Filter construct(long[] keys, int setting) {
+            return CuckooPlus16.construct(keys);
+        }
+    },
     GCS {
         @Override
         public Filter construct(long[] keys, int setting) {
             return GolombCompressedSet.construct(keys, setting);
         }
     };
+//    GCS2 {
+//        @Override
+//        public Filter construct(long[] keys, int setting) {
+//            return GolombCompressedSet2.construct(keys, setting);
+//        }
+//    };
 
     /**
      * Construct the filter with the given keys and the setting.
