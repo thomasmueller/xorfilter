@@ -1,4 +1,4 @@
-package org.xorfilter;
+package org.xorfilter.analysis;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -22,7 +22,7 @@ Run as follows:
 #!/bin/sh
 for rnd in `seq 0 128`; do
   echo ${now} rnd ${rnd};
-  ./bulk-insert-and-query.exe 1000000 -1 ${rnd};
+  ./bulk-insert-and-query.exe 10000000 -1 ${rnd};
 done > results-rnd-2018-10-18.txt
 
 nohup ./test-rnd.sh &
@@ -119,7 +119,7 @@ nohup ./test-rnd.sh &
     private void compareDataOfOneAlgorithm(ArrayList<Data> list) {
         Data result = new Data();
         Data first = list.get(0);
-        System.out.println(first.algorithmName);
+        System.out.print(first.algorithmName);
         result.algorithmId = first.algorithmId;
         result.algorithmName = first.algorithmName;
         result.randomAlgorithm = first.randomAlgorithm;
@@ -130,10 +130,11 @@ nohup ./test-rnd.sh &
         result.find50 = combineData(list, 50, "find50", (d) -> d.find50);
         result.find75 = combineData(list, 50, "find75", (d) -> d.find75);
         result.find100 = combineData(list, 50, "find100", (d) -> d.find100);
-        result.e = combineData(list, 10, "e", (d) -> d.e);
+        result.e = combineData(list, 20, "e", (d) -> d.e);
         result.bitsItem = combineData(list, 0.5, "bitsItem", (d) -> d.bitsItem);
-        result.optBitsItem = combineData(list, 10, "optBitsItem", (d) -> d.optBitsItem);
-        result.wastedSpace = combineData(list, 10, "wastedSpace", (d) -> d.wastedSpace);
+        result.optBitsItem = combineData(list, 20, "optBitsItem", (d) -> d.optBitsItem);
+        result.wastedSpace = combineData(list, 20, "wastedSpace", (d) -> d.wastedSpace);
+        System.out.println();
     }
 
     private double combineData(ArrayList<Data> list, double maxPercentDiff,
@@ -144,6 +145,9 @@ nohup ./test-rnd.sh &
         }
         Arrays.sort(x);
         double median = x[x.length / 2];
+        if ("e".equals(param)) {
+            System.out.print("  e median " + median + " min " + x[0] + " max " + x[x.length - 1]);
+        }
         double diff1 = Math.abs(x[0] - median);
         double diff2 = Math.abs(x[x.length - 1] - median);
         double off1 = 100. / median * x[0];
