@@ -3,6 +3,7 @@ package org.xorfilter;
 import org.junit.Test;
 import org.xorfilter.Filter;
 import org.xorfilter.FilterType;
+import org.xorfilter.utils.Profiler;
 import org.xorfilter.utils.RandomGenerator;
 
 /*
@@ -101,13 +102,13 @@ public class TestAllFilters {
 
     private static void testAll(int len, boolean log) {
         for (FilterType type : FilterType.values()) {
-            test(type, len, log);
+            test(type, len, 0, log);
         }
     }
 
-    private static void test(FilterType type, int len, boolean log) {
+    private static void test(FilterType type, int len, int seed, boolean log) {
         long[] list = new long[len * 2];
-        RandomGenerator.createRandomUniqueListFast(list, len);
+        RandomGenerator.createRandomUniqueListFast(list, len + seed);
         long[] keys = new long[len];
         long[] nonKeys = new long[len];
         // first half is keys, second half is non-keys
@@ -115,8 +116,13 @@ public class TestAllFilters {
             keys[i] = list[i];
             nonKeys[i] = list[i + len];
         }
-        Filter f = type.construct(keys, 8);
         long time = System.nanoTime();
+//Profiler prof = new Profiler().startCollecting();
+        Filter f = type.construct(keys, 8);
+//System.out.println(prof.getTop(10));
+        time = System.nanoTime() - time;
+        double nanosPerAdd = time / len;
+        time = System.nanoTime();
         // each key in the set needs to be found
         int falseNegatives = 0;
         for (int i = 0; i < len; i++) {
@@ -140,7 +146,10 @@ public class TestAllFilters {
         long bitCount = f.getBitCount();
         double bitsPerKey = (double) bitCount / len;
         if (log) {
-            System.out.println(type + " fpp " + fpp + " bits/key " + bitsPerKey + " ns/key " + nanosPerLookup);
+            System.out.println(type + " fpp: " + fpp +
+                    " bits/key: " + bitsPerKey +
+                    " add ns/key: " + nanosPerAdd +
+                    " lookup ns/key: " + nanosPerLookup);
         }
         if (falseNegatives > 0) {
             throw new AssertionError("false negatives: " + falseNegatives);

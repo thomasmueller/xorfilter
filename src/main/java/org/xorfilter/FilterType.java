@@ -2,12 +2,14 @@ package org.xorfilter;
 
 import org.xorfilter.bloom.BlockedBloom;
 import org.xorfilter.bloom.Bloom;
+import org.xorfilter.bloom.CountingBloom;
+import org.xorfilter.bloom.LeanBloom;
+import org.xorfilter.bloom.SuccintCountingBloom;
 import org.xorfilter.cuckoo.Cuckoo16;
 import org.xorfilter.cuckoo.Cuckoo8;
 import org.xorfilter.cuckoo.CuckooPlus16;
 import org.xorfilter.cuckoo.CuckooPlus8;
 import org.xorfilter.gcs.GolombCompressedSet;
-import org.xorfilter.gcs.GolombCompressedSet2;
 import org.xorfilter.xor.Xor16;
 import org.xorfilter.xor.Xor8;
 import org.xorfilter.xor.XorSimple;
@@ -18,6 +20,18 @@ import org.xorfilter.xorplus.XorPlus8;
  * The list of supported approximate membership implementations.
  */
 public enum FilterType {
+    COUNTING_BLOOM {
+        @Override
+        public Filter construct(long[] keys, int setting) {
+            return CountingBloom.construct(keys, setting);
+        }
+    },
+    SUCCINT_COUNTING_BLOOM {
+        @Override
+        public Filter construct(long[] keys, int setting) {
+            return SuccintCountingBloom.construct(keys, setting);
+        }
+    },
     BLOOM {
         @Override
         public Filter construct(long[] keys, int setting) {
@@ -90,12 +104,6 @@ public enum FilterType {
             return GolombCompressedSet.construct(keys, setting);
         }
     };
-//    GCS2 {
-//        @Override
-//        public Filter construct(long[] keys, int setting) {
-//            return GolombCompressedSet2.construct(keys, setting);
-//        }
-//    };
 
     /**
      * Construct the filter with the given keys and the setting.
