@@ -10,8 +10,7 @@ public class CountingBloom implements Filter {
 
     public static CountingBloom construct(long[] keys, double bitsPerKey) {
         long n = keys.length;
-        long m = (long) (n * bitsPerKey);
-        int k = getBestK(m, n);
+        int k = getBestK(bitsPerKey);
         CountingBloom f = new CountingBloom((int) n, bitsPerKey, k);
         for(long x : keys) {
             f.add(x);
@@ -19,8 +18,8 @@ public class CountingBloom implements Filter {
         return f;
     }
 
-    private static int getBestK(long m, long n) {
-        return Math.max(1, (int) Math.round((double) m / n * Math.log(2)));
+    private static int getBestK(double bitsPerKey) {
+        return Math.max(1, (int) Math.round(bitsPerKey * Math.log(2)));
     }
 
     private final int k;

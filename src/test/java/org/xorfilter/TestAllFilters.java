@@ -3,7 +3,6 @@ package org.xorfilter;
 import org.junit.Test;
 import org.xorfilter.Filter;
 import org.xorfilter.FilterType;
-import org.xorfilter.utils.Profiler;
 import org.xorfilter.utils.RandomGenerator;
 
 /*
@@ -79,20 +78,21 @@ This could be, for a LSM tree:
 
 ...
 
-
-
-
-
  */
 
 public class TestAllFilters {
 
     public static void main(String... args) {
-        testAll(1000000, true);
+        for (int size = 1_000_000; size <= 8_000_000; size *= 2) {
+            testAll(size, true);
+            System.out.println();
+        }
         System.out.println();
-        testAll(10000000, true);
-        System.out.println();
-        testAll(100000000, true);
+        for (int size = 10_000_000; size <= 80_000_000; size *= 2) {
+            testAll(size, true);
+            System.out.println();
+        }
+        testAll(100_000_000, true);
     }
 
     @Test
@@ -117,9 +117,7 @@ public class TestAllFilters {
             nonKeys[i] = list[i + len];
         }
         long time = System.nanoTime();
-//Profiler prof = new Profiler().startCollecting();
-        Filter f = type.construct(keys, 8);
-//System.out.println(prof.getTop(10));
+        Filter f = type.construct(keys, 10);
         time = System.nanoTime() - time;
         double nanosPerAdd = time / len;
         time = System.nanoTime();

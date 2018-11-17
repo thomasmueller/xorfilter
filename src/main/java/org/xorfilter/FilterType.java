@@ -3,7 +3,6 @@ package org.xorfilter;
 import org.xorfilter.bloom.BlockedBloom;
 import org.xorfilter.bloom.Bloom;
 import org.xorfilter.bloom.CountingBloom;
-import org.xorfilter.bloom.LeanBloom;
 import org.xorfilter.bloom.SuccintCountingBloom;
 import org.xorfilter.cuckoo.Cuckoo16;
 import org.xorfilter.cuckoo.Cuckoo8;
@@ -20,16 +19,16 @@ import org.xorfilter.xorplus.XorPlus8;
  * The list of supported approximate membership implementations.
  */
 public enum FilterType {
-    COUNTING_BLOOM {
-        @Override
-        public Filter construct(long[] keys, int setting) {
-            return CountingBloom.construct(keys, setting);
-        }
-    },
     SUCCINT_COUNTING_BLOOM {
         @Override
         public Filter construct(long[] keys, int setting) {
             return SuccintCountingBloom.construct(keys, setting);
+        }
+    },
+    COUNTING_BLOOM {
+        @Override
+        public Filter construct(long[] keys, int setting) {
+            return CountingBloom.construct(keys, setting);
         }
     },
     BLOOM {

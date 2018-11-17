@@ -11,8 +11,7 @@ public class Bloom implements Filter {
 
     public static Bloom construct(long[] keys, double bitsPerKey) {
         long n = keys.length;
-        long m = (long) (n * bitsPerKey);
-        int k = getBestK(m, n);
+        int k = getBestK(bitsPerKey);
         Bloom f = new Bloom((int) n, bitsPerKey, k);
         for(long x : keys) {
             f.add(x);
@@ -20,8 +19,8 @@ public class Bloom implements Filter {
         return f;
     }
 
-    private static int getBestK(long m, long n) {
-        return Math.max(1, (int) Math.round((double) m / n * Math.log(2)));
+    private static int getBestK(double bitsPerKey) {
+        return Math.max(1, (int) Math.round(bitsPerKey * Math.log(2)));
     }
 
     private final int k;
@@ -48,15 +47,9 @@ public class Bloom implements Filter {
         int a = (int) (hash >>> 32);
         int b = (int) hash;
         for (int i = 0; i < k; i++) {
-            // reworked to avoid overflows
-            // use the fact that reduce is not very sensitive to lower bits of a
-            data[Hash.reduce(a, arraySize)] |= getBit(a);
+            data[Hash.reduce(a, arraySize)] |= 1L << a;
             a += b;
         }
-    }
-
-    private static long getBit(int index) {
-        return 1L << index;
     }
 
     @Override
@@ -65,8 +58,7 @@ public class Bloom implements Filter {
         int a = (int) (hash >>> 32);
         int b = (int) hash;
         for (int i = 0; i < k; i++) {
-            // reworked to avoid overflows
-            if ((data[Hash.reduce(a, arraySize)] & getBit(a)) == 0) {
+            if ((data[Hash.reduce(a, arraySize)] & 1L << a) == 0) {
                 return false;
             }
             a += b;
